@@ -1,0 +1,67 @@
+{
+  "name": "@repochief/adapters",
+  "version": "1.0.0",
+  "description": "Open source AI terminal adapter framework for RepoChief - enabling community-driven integrations with any AI coding assistant",
+  "main": "src/index.js",
+  "keywords": [
+    "ai",
+    "adapters",
+    "terminal",
+    "orchestration",
+    "claude-code",
+    "aider",
+    "cursor",
+    "gemini",
+    "open-source",
+    "community"
+  ],
+  "author": "RepoChief Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liftping/repochief-adapters.git"
+  },
+  "bugs": {
+    "url": "https://github.com/liftping/repochief-adapters/issues"
+  },
+  "homepage": "https://github.com/liftping/repochief-adapters#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "src/**/*",
+    "docs/**/*",
+    "examples/**/*",
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md"
+  ],
+  "scripts": {
+    "test": "mocha 'tests/**/*.test.js' --exit",
+    "test:unit": "mocha tests/unit/**/*.test.js --exit",
+    "test:integration": "mocha tests/integration/**/*.test.js --exit",
+    "test:watch": "mocha --watch 'tests/**/*.test.js'",
+    "lint": "eslint src/ tests/",
+    "lint:fix": "eslint src/ tests/ --fix",
+    "dev": "nodemon examples/basic-usage.js",
+    "docs:serve": "http-server docs -p 8080",
+    "prepublishOnly": "npm run lint && npm run test"
+  },
+  "dependencies": {
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "chai": "^4.3.10",
+    "eslint": "^8.56.0",
+    "http-server": "^14.1.1",
+    "mocha": "^10.2.0",
+    "nodemon": "^3.0.2",
+    "sinon": "^17.0.1"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/repochief"
+  }
+}
