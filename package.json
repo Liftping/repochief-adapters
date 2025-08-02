@@ -1,5 +1,5 @@
 {
-  "name": "@repochief/adapters",
+  "name": "@liftping/repochief-adapters",
   "version": "1.0.0",
   "description": "Open source AI terminal adapter framework for RepoChief - enabling community-driven integrations with any AI coding assistant",
   "main": "src/index.js",
