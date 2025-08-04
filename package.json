@@ -1,5 +1,5 @@
 {
-  "name": "@liftping/repochief-adapters",
+  "name": "@repochief/adapters",
   "version": "1.0.0",
   "description": "Open source AI terminal adapter framework for RepoChief - enabling community-driven integrations with any AI coding assistant",
   "main": "src/index.js",
@@ -46,7 +46,7 @@
     "lint:fix": "eslint src/ tests/ --fix",
     "dev": "nodemon examples/basic-usage.js",
     "docs:serve": "http-server docs -p 8080",
-    "prepublishOnly": "npm pack --dry-run"
+    "prepublishOnly": "npm run lint && npm run test"
   },
   "dependencies": {
     "uuid": "^9.0.1",
