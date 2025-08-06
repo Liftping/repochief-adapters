@@ -1,6 +1,6 @@
 {
   "name": "@repochief/adapters",
-  "version": "1.0.0",
+  "version": "0.2.1754504153",
   "description": "Open source AI terminal adapter framework for RepoChief - enabling community-driven integrations with any AI coding assistant",
   "main": "src/index.js",
   "keywords": [
