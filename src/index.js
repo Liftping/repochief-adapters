@@ -18,6 +18,9 @@ const OrchestrationStrategy = require('./strategies/OrchestrationStrategy');
 // Enhanced adapters
 const GeminiCLIAdapterV2 = require('./enhanced/GeminiCLIAdapterV2');
 
+// Specialized adapters
+const ClaudeCodeAdapter = require('./adapters/claude-code/ClaudeCodeAdapter');
+
 // Export main classes
 module.exports = {
     // Core Framework
@@ -29,11 +32,16 @@ module.exports = {
     // Enhanced Adapters
     GeminiCLIAdapterV2,
     
+    // Specialized Adapters
+    ClaudeCodeAdapter,
+    
     // Utility functions
     createAdapter: (type, config) => {
         switch (type) {
             case 'gemini-cli-v2':
                 return new GeminiCLIAdapterV2(config);
+            case 'claude-code':
+                return new ClaudeCodeAdapter(config);
             default:
                 throw new Error(`Unknown adapter type: ${type}`);
         }
@@ -70,3 +78,4 @@ module.exports.TaskRouter = TaskRouter;
 module.exports.AIAgentAdapter = AIAgentAdapter;
 module.exports.OrchestrationStrategy = OrchestrationStrategy;
 module.exports.GeminiCLIAdapterV2 = GeminiCLIAdapterV2;
+module.exports.ClaudeCodeAdapter = ClaudeCodeAdapter;
