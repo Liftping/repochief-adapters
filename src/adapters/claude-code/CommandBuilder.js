@@ -12,6 +12,78 @@ class CommandBuilder {
     }
     
     /**
+     * Sanitize string input to prevent command injection
+     * @private
+     */
+    _sanitize(str) {
+        if (!str) return '';
+        
+        // Remove potentially dangerous shell metacharacters
+        return str
+            .replace(/[;&|`$(){}[\]<>]/g, '') // Remove shell metacharacters
+            .replace(/\\/g, '\\\\')            // Escape backslashes
+            .replace(/"/g, '\\"')               // Escape quotes
+            .replace(/'/g, "\\'")               // Escape single quotes
+            .replace(/\n/g, ' ')                // Replace newlines with spaces
+            .replace(/\r/g, '')                 // Remove carriage returns
+            .replace(/\t/g, ' ')                // Replace tabs with spaces
+            .trim();
+    }
+    
+    /**
+     * Validate and sanitize file path
+     * @private
+     */
+    _validateFilePath(filePath) {
+        if (!filePath) return null;
+        
+        // Normalize the path
+        const path = require('path');
+        const normalizedPath = path.normalize(filePath);
+        
+        // Block absolute paths and parent directory traversal
+        if (path.isAbsolute(normalizedPath)) {
+            console.warn(`[Security] Blocked absolute path: ${filePath}`);
+            return null;
+        }
+        
+        if (normalizedPath.includes('..')) {
+            console.warn(`[Security] Blocked parent directory traversal: ${filePath}`);
+            return null;
+        }
+        
+        // Additional checks for suspicious patterns
+        const suspiciousPatterns = [
+            /^\/dev\//,     // Device files
+            /^\/proc\//,    // Process information
+            /^\/sys\//,     // System files
+            /\.\.\/\.\.\//  // Multiple parent directory attempts
+        ];
+        
+        for (const pattern of suspiciousPatterns) {
+            if (pattern.test(normalizedPath)) {
+                console.warn(`[Security] Blocked suspicious path pattern: ${filePath}`);
+                return null;
+            }
+        }
+        
+        return this._sanitize(normalizedPath);
+    }
+    
+    /**
+     * Validate session ID format
+     * @private
+     */
+    _validateSessionId(sessionId) {
+        // Session ID should only contain alphanumeric, hyphens, and underscores
+        const validPattern = /^[a-zA-Z0-9_-]+$/;
+        if (!validPattern.test(sessionId)) {
+            throw new Error(`Invalid session ID format: ${sessionId}`);
+        }
+        return sessionId;
+    }
+    
+    /**
      * Initialize schedule templates mapping
      */
     initializeTemplates() {
@@ -120,11 +192,17 @@ Output format: JSON with structured recommendations.`,
             sessionId = 'default'
         } = options;
         
+        // Validate and sanitize session ID
+        const validatedSessionId = this._validateSessionId(sessionId);
+        
+        // Sanitize workspace root
+        const sanitizedWorkspaceRoot = this._sanitize(workspaceRoot);
+        
         // Check if task uses a template
         if (task.template) {
             return this.buildTemplateCommand(task.template, task.parameters || {}, {
-                workspaceRoot,
-                sessionId,
+                workspaceRoot: sanitizedWorkspaceRoot,
+                sessionId: validatedSessionId,
                 ...options
             });
         }
@@ -340,25 +418,35 @@ Please provide the refactored code with explanations for changes made.`;
     buildGenericCommand(task, options = {}) {
         const { workspaceRoot = process.cwd(), sessionId = 'default' } = options;
         
-        let command = 'claude --interactive=false';
-        command += ` --working-directory="${workspaceRoot}"`;
-        command += ` --session-id="${sessionId}"`;
+        // Validate and sanitize inputs
+        const validatedSessionId = this._validateSessionId(sessionId);
+        const sanitizedWorkspaceRoot = this._sanitize(workspaceRoot);
         
-        // Add context files if specified
+        let command = 'claude --interactive=false';
+        command += ` --working-directory="${sanitizedWorkspaceRoot}"`;
+        command += ` --session-id="${validatedSessionId}"`;
+        
+        // Add context files if specified (with validation)
         if (task.context?.files?.length > 0) {
-            command += ` --context="${task.context.files.join(' ')}"`;
+            const validatedFiles = task.context.files
+                .map(file => this._validateFilePath(file))
+                .filter(file => file !== null);
+            
+            if (validatedFiles.length > 0) {
+                command += ` --context="${validatedFiles.join(' ')}"`;
+            }
         }
         
-        // Use task description as prompt
-        const escapedPrompt = task.description.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-        command += ` "${escapedPrompt}"`;
+        // Sanitize task description for use as prompt
+        const sanitizedPrompt = this._sanitize(task.description || '');
+        command += ` "${sanitizedPrompt}"`;
         
         return {
             command,
             template: 'generic',
-            prompt: task.description,
-            workspaceRoot,
-            sessionId,
+            prompt: sanitizedPrompt,
+            workspaceRoot: sanitizedWorkspaceRoot,
+            sessionId: validatedSessionId,
             timeout: 180000, // 3 minutes
             expectsJson: false
         };
