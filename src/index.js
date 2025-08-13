@@ -14,6 +14,7 @@ const AdapterRegistry = require('./AdapterRegistry');
 const TaskRouter = require('./TaskRouter');
 const AIAgentAdapter = require('./base/AIAgentAdapter');
 const OrchestrationStrategy = require('./strategies/OrchestrationStrategy');
+const AdapterFactory = require('./factory/AdapterFactory');
 
 // Enhanced adapters
 const GeminiCLIAdapterV2 = require('./enhanced/GeminiCLIAdapterV2');
@@ -28,6 +29,7 @@ module.exports = {
     TaskRouter,
     AIAgentAdapter,
     OrchestrationStrategy,
+    AdapterFactory,
     
     // Enhanced Adapters
     GeminiCLIAdapterV2,
@@ -77,5 +79,6 @@ module.exports.AdapterRegistry = AdapterRegistry;
 module.exports.TaskRouter = TaskRouter;
 module.exports.AIAgentAdapter = AIAgentAdapter;
 module.exports.OrchestrationStrategy = OrchestrationStrategy;
+module.exports.AdapterFactory = AdapterFactory;
 module.exports.GeminiCLIAdapterV2 = GeminiCLIAdapterV2;
 module.exports.ClaudeCodeAdapter = ClaudeCodeAdapter;
